@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and authorization
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  name          String
+  role          UserRole
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  teams         Team[]    @relation("TeamMembers")
+  managedTeams  Team[]    @relation("TeamAdmin")
+  events        Event[]
+  matches       Match[]   @relation("MatchReferee")
+  scoredMatches Match[]   @relation("MatchScorer")
+}
+
+enum UserRole {
+  EVENT_ADMIN
+  REFEREE
+  HEAD_REFEREE
+  INSPECTOR
+  TEAM_MEMBER
+}
+
+// Team model for robotics teams
+model Team {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  members     User[]    @relation("TeamMembers")
+  admin       User      @relation("TeamAdmin", fields: [adminId], references: [id])
+  adminId     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  events      Event[]   @relation("EventTeams")
+  matches     Match[]   @relation("MatchTeams")
+  inspections Inspection[]
+}
+
+// Event model for robotics competitions
+model Event {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  location    String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  teams       Team[]    @relation("EventTeams")
+  matches     Match[]
+}
+
+// Match model for individual matches in a competition
+model Match {
+  id            String    @id @default(uuid())
+  matchNumber   Int
+  startTime     DateTime
+  endTime       DateTime?
+  status        MatchStatus @default(SCHEDULED)
+  event         Event     @relation(fields: [eventId], references: [id])
+  eventId       String
+  teams         Team[]    @relation("MatchTeams")
+  referee       User?     @relation("MatchReferee", fields: [refereeId], references: [id])
+  refereeId     String?
+  scorer        User?     @relation("MatchScorer", fields: [scorerId], references: [id])
+  scorerId      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  scores        Score[]
+  penalties     Penalty[]
+}
+
+enum MatchStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Score model for tracking points in matches
+model Score {
+  id        String    @id @default(uuid())
+  match     Match     @relation(fields: [matchId], references: [id])
+  matchId   String
+  teamId    String
+  scoreType ScoreType
+  points    Int
+  timestamp DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum ScoreType {
+  AUTONOMOUS
+  DRIVER_CONTROLLED
+  ENDGAME
+  BONUS
+}
+
+// Penalty model for tracking penalties in matches
+model Penalty {
+  id        String      @id @default(uuid())
+  match     Match       @relation(fields: [matchId], references: [id])
+  matchId   String
+  teamId    String
+  type      PenaltyType
+  points    Int
+  timestamp DateTime    @default(now())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+enum PenaltyType {
+  MINOR
+  MAJOR
+  YELLOW_CARD
+  RED_CARD
+  DISQUALIFICATION
+}
+
+// Inspection model for robot inspections
+model Inspection {
+  id          String          @id @default(uuid())
+  team        Team            @relation(fields: [teamId], references: [id])
+  teamId      String
+  status      InspectionStatus @default(PENDING)
+  notes       String?
+  timestamp   DateTime        @default(now())
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+enum InspectionStatus {
+  PENDING
+  PASSED
+  FAILED
+  CONDITIONAL_PASS
+}
