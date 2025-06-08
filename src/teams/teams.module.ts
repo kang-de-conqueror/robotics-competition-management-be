@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { TeamsController } from './teams.controller';
+import { AuthModule } from '../auth/auth.module';
+import { PrismaModule } from '../prisma/prisma.module';
+import { EmailsModule } from '../emails/emails.module';
 
 @Module({
+  imports: [AuthModule, PrismaModule, EmailsModule],
+  controllers: [TeamsController],
   providers: [TeamsService],
-  controllers: [TeamsController]
+  exports: [TeamsService],
 })
 export class TeamsModule {}

@@ -4,6 +4,6 @@ import { MatchesController } from './matches.controller';
 
 @Module({
   providers: [MatchesService],
-  controllers: [MatchesController]
+  controllers: [MatchesController],
 })
 export class MatchesModule {}
