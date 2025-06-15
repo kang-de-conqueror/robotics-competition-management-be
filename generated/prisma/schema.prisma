@@ -18,7 +18,12 @@ enum UserRole {
   ADMIN
   HEAD_REFEREE
   ALLIANCE_REFEREE
-  COMMON
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
 }
 
 enum StageType {
@@ -80,12 +85,13 @@ enum MatchType {
 
 model User {
   id             String            @id @default(uuid())
-  username       String            @unique
-  password       String
-  role           UserRole
-  email          String?           @unique
+  email          String            @unique
+  password       String?
+  role           UserRole          @default(USER)
+  status         UserStatus        @default(INACTIVE)
+  name           String?
   gender         Boolean?
-  DateOfBirth    DateTime?
+  dateOfBirth    DateTime?
   phoneNumber    String?
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
@@ -95,7 +101,9 @@ model User {
   tournaments    Tournament[]
   scoredMatches  Match[]           @relation("ScoredBy")
   allianceRefFor AllianceScoring[] @relation("AllianceReferee")
-  matchReferees  MatchReferee[] // New relation for match referees
+  matchReferees  MatchReferee[]
+  ledTeams       Team[]            @relation("TeamLeader")
+  teamMembers    Team[]            @relation("TeamMembers")
 }
 
 model Tournament {
@@ -113,6 +121,8 @@ model Tournament {
   teamStats      TeamStats[] // New relation to track team statistics
   fields         Field[] // New relation: Tournament has many Fields
   numberOfFields Int         @default(1)
+  maxTeams       Int?
+  maxTeamMembers Int?
 }
 
 model Stage {
@@ -203,16 +213,26 @@ model AllianceScoring {
   updatedAt    DateTime @updatedAt
 }
 
+enum TeamStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Team {
   id            String         @id @default(uuid())
-  teamNumber    String         @unique
+  teamNumber    String?        @unique
   name          String
   organization  String?
-  avatar        String? // URL to team avatar image
-  description   String? // Team description
-  teamMembers   Json? // Store team members as a JSON array
-  tournamentId  String? // Optional link to tournament
-  tournament    Tournament?    @relation(fields: [tournamentId], references: [id])
+  province      String?
+  avatar        String?
+  description   String?
+  leader        User           @relation("TeamLeader", fields: [leaderId], references: [id])
+  leaderId      String
+  teamMembers   User[]         @relation("TeamMembers")
+  tournament    Tournament     @relation(fields: [tournamentId], references: [id])
+  tournamentId  String
+  status        TeamStatus     @default(PENDING)
   teamAlliances TeamAlliance[]
   teamStats     TeamStats[] // New relation to track team statistics
   createdAt     DateTime       @default(now())

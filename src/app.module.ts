@@ -9,9 +9,22 @@ import { EventsModule } from './events/events.module';
 import { MatchesModule } from './matches/matches.module';
 import { InspectionsModule } from './inspections/inspections.module';
 import { WebsocketsModule } from './websockets/websockets.module';
+import { EmailsModule } from './emails/emails.module';
+import { TournamentsModule } from './tournaments/tournaments.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, TeamsModule, EventsModule, MatchesModule, InspectionsModule, WebsocketsModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    UsersModule,
+    TeamsModule,
+    EventsModule,
+    MatchesModule,
+    InspectionsModule,
+    WebsocketsModule,
+    EmailsModule,
+    TournamentsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -119,12 +119,13 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
-  username: 'username',
+  email: 'email',
   password: 'password',
   role: 'role',
-  email: 'email',
+  status: 'status',
+  name: 'name',
   gender: 'gender',
-  DateOfBirth: 'DateOfBirth',
+  dateOfBirth: 'dateOfBirth',
   phoneNumber: 'phoneNumber',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -140,7 +141,9 @@ exports.Prisma.TournamentScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   adminId: 'adminId',
-  numberOfFields: 'numberOfFields'
+  numberOfFields: 'numberOfFields',
+  maxTeams: 'maxTeams',
+  maxTeamMembers: 'maxTeamMembers'
 };
 
 exports.Prisma.StageScalarFieldEnum = {
@@ -213,10 +216,12 @@ exports.Prisma.TeamScalarFieldEnum = {
   teamNumber: 'teamNumber',
   name: 'name',
   organization: 'organization',
+  province: 'province',
   avatar: 'avatar',
   description: 'description',
-  teamMembers: 'teamMembers',
+  leaderId: 'leaderId',
   tournamentId: 'tournamentId',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -374,7 +379,12 @@ exports.UserRole = exports.$Enums.UserRole = {
   ADMIN: 'ADMIN',
   HEAD_REFEREE: 'HEAD_REFEREE',
   ALLIANCE_REFEREE: 'ALLIANCE_REFEREE',
-  COMMON: 'COMMON'
+  USER: 'USER'
+};
+
+exports.UserStatus = exports.$Enums.UserStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
 };
 
 exports.StageType = exports.$Enums.StageType = {
@@ -397,6 +407,12 @@ exports.CardType = exports.$Enums.CardType = {
   NONE: 'NONE',
   YELLOW: 'YELLOW',
   RED: 'RED'
+};
+
+exports.TeamStatus = exports.$Enums.TeamStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
 };
 
 exports.MatchState = exports.$Enums.MatchState = {
